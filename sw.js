@@ -13,14 +13,12 @@ self.addEventListener('activate',e=>{
 self.addEventListener('fetch',e=>{
   const req=e.request;
   if(req.method!=='GET')return;
-  /* Navegación: primero red (para recibir actualizaciones), si no hay conexión -> caché */
   if(req.mode==='navigate'){
     e.respondWith(fetch(req).then(res=>{
       const cl=res.clone();caches.open(CACHE).then(c=>c.put('./index.html',cl));return res;
     }).catch(()=>caches.match('./index.html')));
     return;
   }
-  /* Resto (fuentes, iconos...): caché primero */
   e.respondWith(caches.match(req).then(r=>r||fetch(req).then(res=>{
     const cl=res.clone();caches.open(CACHE).then(c=>c.put(req,cl));return res;
   })));
